@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global brand defaults */
+:root{
+  --brand-primary: #317C82;
+  --brand-accent: #D3A24C;
+  --brand-dark: #1C5F62;
+}
+
+html, body, #__next {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  color: var(--brand-dark);
+  background-color: #ffffff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Link & button defaults */
+a {
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.12s ease;
+  color: var(--brand-primary);
+  text-decoration: none;
+}
+
+a:hover, button:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* Small utility to use the accent color */
+.btn-accent {
+  background-color: var(--brand-accent);
+  color: white;
+}
+
+/* Focus styles for accessibility */
+:focus {
+  outline: 3px solid rgba(49,124,130,0.12);
+  outline-offset: 2px;
+}
