@@ -10,7 +10,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Carekov — Care at Your Home</title>
+        <title>Carekov —  Old Age & Medical Care at Home</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 

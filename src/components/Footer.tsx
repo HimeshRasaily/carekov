@@ -1,4 +1,6 @@
 import Image from "next/image";
+import Link from "next/link";
+
 export default function Footer() {
   const year = new Date().getFullYear();
 
@@ -60,7 +62,10 @@ export default function Footer() {
         <div className="max-w-6xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center text-sm text-gray-600">
           <div>© {year} Carekov — All rights reserved</div>
           <div className="mt-3 md:mt-0">
-            <a href="/terms" className="mr-4 hover:underline">Terms</a>
+            <Link href="/terms-and-conditions" className="mr-4 hover:underline">
+  Terms & Conditions
+</Link>
+
             <a href="/privacy" className="hover:underline">Privacy</a>
           </div>
         </div>

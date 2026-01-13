@@ -1,7 +1,8 @@
+import Head from "next/head";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
-export default function Services() {
+export default function ServicesPage() {
   const services = [
     {
       title: "Home Nursing",
@@ -31,31 +32,41 @@ export default function Services() {
 
   return (
     <>
+      <Head>
+        <title>Services | CareKov</title>
+        <meta
+          name="description"
+          content="Explore CareKov’s home healthcare services including nursing, physiotherapy, elderly care, and medical equipment rentals."
+        />
+      </Head>
+
       <Header />
 
-      {/* Hero Section */}
+      {/* Hero */}
       <section className="bg-[#317C82] text-white py-16">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <h1 className="text-4xl font-bold">Our Services</h1>
           <p className="mt-4 text-lg text-white/90">
-            Carekov brings comprehensive healthcare services straight to your home.
+            Quality healthcare services delivered to your home.
           </p>
         </div>
       </section>
 
-      {/* Services Grid */}
+      {/* Grid */}
       <section className="max-w-6xl mx-auto px-4 py-16">
         <h2 className="text-2xl font-semibold text-[#1C5F62] mb-8 text-center">
-          Explore Our Offerings
+          What We Offer
         </h2>
 
         <div className="grid md:grid-cols-3 gap-8">
           {services.map((service, idx) => (
             <div
               key={idx}
-              className="p-6 rounded-xl border shadow-sm hover:shadow-md transition bg-white"
+              className="p-6 rounded-xl border bg-white shadow-sm hover:shadow-md transition"
             >
-              <h3 className="text-xl font-bold text-[#317C82]">{service.title}</h3>
+              <h3 className="text-xl font-bold text-[#317C82]">
+                {service.title}
+              </h3>
               <p className="mt-2 text-gray-600">{service.description}</p>
             </div>
           ))}

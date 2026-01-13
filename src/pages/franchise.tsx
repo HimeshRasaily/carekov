@@ -1,143 +1,91 @@
+import Head from "next/head";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import { useState } from "react";
 
-export default function Franchise() {
-  const [submitted, setSubmitted] = useState(false);
-
-  const handleSubmit = (e: any) => {
-    e.preventDefault();
-    setSubmitted(true);
-  };
-
-  const benefits = [
-    {
-      title: "Fast-Growing Healthcare Market",
-      desc: "Home healthcare services are expanding rapidly with increasing demand for elderly care, physiotherapy, and diagnostics.",
-    },
-    {
-      title: "Strong Brand Identity",
-      desc: "Carekov provides premium branding, technology support, and operations assistance.",
-    },
-    {
-      title: "Low Startup Cost",
-      desc: "Begin with minimal infrastructure using Carekov’s scalable service model.",
-    },
-    {
-      title: "Training & Operational Support",
-      desc: "We provide onboarding, training modules, SOPs, and real-time support.",
-    },
-    {
-      title: "Exclusive Territory Rights",
-      desc: "Grow your region exclusively with full marketing and operations backing.",
-    },
-    {
-      title: "Technology-Powered Business",
-      desc: "You get access to the Carekov platform, CRM, scheduling system, and client management tools.",
-    },
-  ];
-
+export default function FranchisePartnership() {
   return (
     <>
+      <Head>
+        <title>Franchise Partnership | CareKov</title>
+        <meta
+          name="description"
+          content="Partner with CareKov through our franchise program and bring trusted elderly care services to your community."
+        />
+      </Head>
+
       <Header />
 
-      {/* HERO */}
-      <section className="bg-[#317C82] text-white py-16 text-center">
-        <h1 className="text-4xl font-bold">Franchise Partnership</h1>
-        <p className="mt-4 text-lg text-white/90 max-w-3xl mx-auto">
-          Become a part of Carekov’s expanding healthcare network and bring quality medical services to your region.
-        </p>
-      </section>
+      <main className="max-w-6xl mx-auto px-4 py-16 text-gray-700">
+        <h1 className="text-3xl font-bold text-[#1C5F62] mb-8">
+          Franchise Partnership
+        </h1>
 
-      {/* WHY PARTNER */}
-      <section className="max-w-6xl mx-auto px-4 py-16">
-        <h2 className="text-2xl font-bold text-center text-[#1C5F62]">
-          Why Partner with Carekov?
-        </h2>
+        <section className="space-y-6 leading-relaxed">
+          <p>
+            At Carekov, we are committed to expanding access to quality elderly
+            care across communities. Our Franchise Partnership program offers a
+            unique opportunity for entrepreneurs and healthcare professionals
+            to join our mission and bring trusted care services to more seniors.
+          </p>
 
-        <div className="grid md:grid-cols-3 gap-8 mt-12">
-          {benefits.map((item, idx) => (
-            <div key={idx} className="p-6 border rounded-xl shadow-sm bg-white hover:shadow-md transition">
-              <h3 className="text-xl font-semibold text-[#317C82]">{item.title}</h3>
-              <p className="mt-2 text-gray-600">{item.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+          <h2 className="text-2xl font-semibold text-[#317C82] mt-12">
+            Why Partner with Carekov?
+          </h2>
 
-      {/* FORM */}
-      <section className="max-w-3xl mx-auto px-4 pb-20">
-        <h3 className="text-2xl font-semibold text-center text-[#1C5F62] mb-8">
-          Partnership Enquiry Form
-        </h3>
+          <ul className="list-disc pl-6 space-y-3">
+            <li>
+              <strong>Proven Business Model:</strong> Leverage our established
+              brand, systems, and operational support to start and grow your
+              Carekov franchise.
+            </li>
+            <li>
+              <strong>Comprehensive Training:</strong> Receive thorough training
+              in elderly care services, customer support, and business management.
+            </li>
+            <li>
+              <strong>Marketing Support:</strong> Benefit from national and local
+              marketing campaigns, promotional materials, and online visibility.
+            </li>
+            <li>
+              <strong>Exclusive Territories:</strong> Gain access to protected
+              regions, ensuring a focused and sustainable approach to growth.
+            </li>
+            <li>
+              <strong>Ongoing Assistance:</strong> From operations to product
+              sourcing, our team provides continuous guidance to ensure success.
+            </li>
+          </ul>
 
-        {!submitted ? (
-          <form
-            onSubmit={handleSubmit}
-            className="bg-white border rounded-xl shadow-sm p-8 space-y-6"
-          >
-            <div>
-              <label className="block text-sm font-medium text-[#1C5F62]">Full Name</label>
-              <input
-                type="text"
-                required
-                className="mt-2 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-[#317C82]"
-              />
-            </div>
+          <h2 className="text-2xl font-semibold text-[#317C82] mt-12">
+            Who Can Join?
+          </h2>
 
-            <div>
-              <label className="block text-sm font-medium text-[#1C5F62]">Phone Number</label>
-              <input
-                type="tel"
-                required
-                className="mt-2 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-[#317C82]"
-              />
-            </div>
+          <p>
+            Entrepreneurs, healthcare professionals, or individuals passionate
+            about elderly care and community well-being are welcome to apply. No
+            prior healthcare experience is required, as full training is provided.
+          </p>
 
-            <div>
-              <label className="block text-sm font-medium text-[#1C5F62]">Email</label>
-              <input
-                type="email"
-                required
-                className="mt-2 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-[#317C82]"
-              />
-            </div>
+          <h2 className="text-2xl font-semibold text-[#317C82] mt-12">
+            How to Apply
+          </h2>
 
-            <div>
-              <label className="block text-sm font-medium text-[#1C5F62]">City / Region</label>
-              <input
-                type="text"
-                required
-                className="mt-2 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-[#317C82]"
-              />
-            </div>
+          <ol className="list-decimal pl-6 space-y-2">
+            <li>Fill out the franchise inquiry form.</li>
+            <li>Attend an initial consultation and briefing session.</li>
+            <li>Complete training and set up your Carekov franchise.</li>
+            <li>
+              Start providing exceptional elderly care services in your region.
+            </li>
+          </ol>
 
-            <div>
-              <label className="block text-sm font-medium text-[#1C5F62]">
-                Message (optional)
-              </label>
-              <textarea
-                rows={4}
-                className="mt-2 w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-[#317C82]"
-              ></textarea>
-            </div>
-
-            <button
-              type="submit"
-              className="w-full py-3 bg-[#317C82] text-white rounded-md text-lg hover:opacity-90"
-            >
-              Submit Enquiry
-            </button>
-          </form>
-        ) : (
-          <div className="p-10 bg-green-50 border rounded-xl text-center shadow-sm">
-            <h2 className="text-2xl font-semibold text-[#317C82]">Enquiry Submitted!</h2>
-            <p className="mt-3 text-[#1C5F62]">
-              Our franchise team will reach out to you shortly.
-            </p>
-          </div>
-        )}
-      </section>
+          <p className="mt-10 font-medium">
+            Join the Carekov family and help create safer, healthier, and more
+            comfortable lives for seniors everywhere. Together, we can make a
+            meaningful difference.
+          </p>
+        </section>
+      </main>
 
       <Footer />
     </>

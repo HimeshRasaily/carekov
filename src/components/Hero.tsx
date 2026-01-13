@@ -28,13 +28,13 @@ export default function Hero() {
         >
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white leading-tight">
 
-            Beyond the monitor, a connection.
+           Beyond the monitor,  a connection.
             <br />
-            That’s the heart of CareKov.
+          That’s the heart of CareKov.
           </h1>
 
           <p className="mt-4 text-sm sm:text-base md:text-lg text-white/90">
-  	    On-demand home health services—delivered with care, compassion, and trust.
+  	     Trusted elderly care and medical services delivered safely at your home.
 	</p>
 
           
