@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import Block from "../../components/Block";
+import CTA from "../../components/CTA";
 
 
 export default function ProductsPage() {
