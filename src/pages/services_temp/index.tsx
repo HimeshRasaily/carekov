@@ -6,6 +6,19 @@ import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import Link from "next/link";
 
+<div
+  style={{
+    background: "red",
+    color: "white",
+    padding: "40px",
+    fontSize: "24px",
+    fontWeight: "bold",
+  }}
+>
+  🚨 SERVICES PAGE TEST — IF YOU SEE THIS, DEPLOYMENT IS CORRECT 🚨
+</div>
+
+
 export default function ServicesPage() {
   return (
     <>
