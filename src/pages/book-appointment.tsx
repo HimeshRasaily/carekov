@@ -1,228 +1,258 @@
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+"use client";
+
+import Head from "next/head";
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-export default function BookAppointment() {
-  const [submitted, setSubmitted] = useState(false);
+export default function ServicesPage() {
+  const [showAuthPopup, setShowAuthPopup] = useState(false);
+  const router = useRouter();
 
-  const handleSubmit = (e: any) => {
-    e.preventDefault();
-    setSubmitted(true);
-  };
+  const requireAuth = () => setShowAuthPopup(true);
 
   return (
     <>
+      <Head>
+        <title>CareKov Services</title>
+      </Head>
+
       <Header />
 
-      {/* Hero Section */}
-      <section className="bg-[#317C82] text-white py-16">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <h1 className="text-4xl font-bold">Book an Appointment</h1>
-          <p className="mt-4 text-lg text-white/90 max-w-3xl mx-auto">
-            At Carekov, we make accessing quality elderly care simple and
-            convenient. Schedule consultations, health check-ups, and
-            personalized care services with ease.
-          </p>
-        </div>
-      </section>
+      <main className="min-h-screen">
 
-      {/* Benefits Section */}
-      <section className="max-w-6xl mx-auto px-4 py-14">
-        <div className="grid md:grid-cols-4 gap-6 text-center">
-          <div className="p-6 bg-white border rounded-xl shadow-sm">
-            <h3 className="font-semibold text-[#317C82]">Easy Scheduling</h3>
-            <p className="text-sm text-gray-600 mt-2">
-              Select the service, date, and time that works best for you.
+        {/* Hero */}
+        <section className="bg-gray-50 py-20">
+          <div className="max-w-6xl mx-auto px-4 text-center">
+            <h1 className="text-4xl font-bold text-[#1C5F62]">
+              Our Elderly Care Services
+            </h1>
+            <p className="mt-4 text-gray-600 max-w-2xl mx-auto">
+              Comprehensive elderly care services designed to support seniors
+              with dignity, safety, and compassion.
             </p>
           </div>
+        </section>
 
-          <div className="p-6 bg-white border rounded-xl shadow-sm">
-            <h3 className="font-semibold text-[#317C82]">
-              Qualified Professionals
-            </h3>
-            <p className="text-sm text-gray-600 mt-2">
-              Meet experienced doctors, physiotherapists, and caregivers.
-            </p>
-          </div>
+        {/* REGULAR SERVICES */}
+        <section className="max-w-6xl mx-auto px-4 py-16">
+          <h2 className="text-2xl font-semibold text-[#317C82] mb-8">
+            Regular Services
+          </h2>
 
-          <div className="p-6 bg-white border rounded-xl shadow-sm">
-            <h3 className="font-semibold text-[#317C82]">
-              Reminders & Notifications
-            </h3>
-            <p className="text-sm text-gray-600 mt-2">
-              Receive timely reminders so nothing is missed.
-            </p>
-          </div>
-
-          <div className="p-6 bg-white border rounded-xl shadow-sm">
-            <h3 className="font-semibold text-[#317C82]">Flexible Options</h3>
-            <p className="text-sm text-gray-600 mt-2">
-              Choose between in-person visits or virtual consultations.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Appointment Form */}
-      <section className="max-w-3xl mx-auto px-4 py-16">
-        {!submitted ? (
-          <form
-            onSubmit={handleSubmit}
-            className="bg-white border rounded-2xl shadow-sm p-8 space-y-6"
-          >
-            {/* Your Name */}
-            <div>
-              <label className="block text-sm font-medium text-[#1C5F62]">
-                Your Name
-              </label>
-              <input
-                type="text"
-                required
-                className="mt-2 w-full border rounded-md px-4 py-2 focus:ring-2 focus:ring-[#317C82]"
-              />
-            </div>
-
-            {/* Your Contact */}
-            <div>
-              <label className="block text-sm font-medium text-[#1C5F62]">
-                Your Mobile Number / Email ID
-              </label>
-              <input
-                type="text"
-                required
-                className="mt-2 w-full border rounded-md px-4 py-2 focus:ring-2 focus:ring-[#317C82]"
-              />
-            </div>
-
-            {/* Client Name */}
-            <div>
-              <label className="block text-sm font-medium text-[#1C5F62]">
-                Client Name
-              </label>
-              <input
-                type="text"
-                required
-                className="mt-2 w-full border rounded-md px-4 py-2 focus:ring-2 focus:ring-[#317C82]"
-              />
-            </div>
-
-            {/* Client Contact */}
-            <div>
-              <label className="block text-sm font-medium text-[#1C5F62]">
-                Client’s Mobile Number / Email ID
-              </label>
-              <input
-                type="text"
-                required
-                className="mt-2 w-full border rounded-md px-4 py-2 focus:ring-2 focus:ring-[#317C82]"
-              />
-            </div>
-
-            {/* City */}
-            <div>
-              <label className="block text-sm font-medium text-[#1C5F62]">
-                Select City
-              </label>
-              <select
-                required
-                className="mt-2 w-full border rounded-md px-4 py-2 focus:ring-2 focus:ring-[#317C82]"
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                name: "Errand Assistance",
+                desc: "Groceries, medicines, bill payments, appointments and product procurement."
+              },
+              {
+                name: "Daily Living Assistance",
+                desc: "Bathing, hygiene, mobility, feeding, and toileting support."
+              },
+              {
+                name: "Nursing & Health Monitoring",
+                desc: "Vitals monitoring, medication support, and basic wound care."
+              }
+            ].map((service) => (
+              <div
+                key={service.name}
+                className="border rounded-xl bg-white p-6 hover:shadow-lg transition"
               >
-                <option value="">-- Select City --</option>
-                <option>Mumbai</option>
-                <option>Pune</option>
-              </select>
-            </div>
+                <h3 className="text-lg font-semibold text-[#317C82]">
+                  {service.name}
+                </h3>
+                <p className="mt-3 text-gray-600">{service.desc}</p>
 
-            {/* Service */}
-            <div>
-              <label className="block text-sm font-medium text-[#1C5F62]">
-                Select Service
-              </label>
-              <select
-                required
-                className="mt-2 w-full border rounded-md px-4 py-2 focus:ring-2 focus:ring-[#317C82]"
-              >
-                <option value="">-- Select Service --</option>
-                <option disabled>Elderly Care (Coming Soon)</option>
-                <option disabled>Home Nursing</option>
-                <option disabled>Physiotherapy</option>
-              </select>
-            </div>
+                <div className="mt-4 text-sm text-gray-500">
+                  Starting from <strong>₹ — / visit</strong>
+                </div>
 
-            {/* Date & Time */}
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-[#1C5F62]">
-                  Preferred Appointment Date
-                </label>
-                <input
-                  type="date"
-                  required
-                  className="mt-2 w-full border rounded-md px-4 py-2 focus:ring-2 focus:ring-[#317C82]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[#1C5F62]">
-                  Preferred Time Slot
-                </label>
-                <select
-                  required
-                  className="mt-2 w-full border rounded-md px-4 py-2 focus:ring-2 focus:ring-[#317C82]"
+                <button
+                  onClick={requireAuth}
+                  className="mt-6 w-full bg-[#317C82] text-white py-2 rounded-md hover:opacity-90"
                 >
-                  <option value="">-- Select Time --</option>
-                  <option>Morning (9 AM – 12 PM)</option>
-                  <option>Afternoon (12 PM – 4 PM)</option>
-                  <option>Evening (4 PM – 8 PM)</option>
-                </select>
+                  Book Service
+                </button>
               </div>
-            </div>
-
-            {/* Address */}
-            <div>
-              <label className="block text-sm font-medium text-[#1C5F62]">
-                Client Address
-              </label>
-              <textarea
-                required
-                rows={3}
-                className="mt-2 w-full border rounded-md px-4 py-2 focus:ring-2 focus:ring-[#317C82]"
-              ></textarea>
-            </div>
-
-            {/* Remarks */}
-            <div>
-              <label className="block text-sm font-medium text-[#1C5F62]">
-                Remarks
-              </label>
-              <textarea
-                rows={3}
-                className="mt-2 w-full border rounded-md px-4 py-2 focus:ring-2 focus:ring-[#317C82]"
-                placeholder="Any additional information..."
-              ></textarea>
-            </div>
-
-            {/* Submit */}
-            <button
-              type="submit"
-              className="w-full py-3 bg-[#317C82] text-white rounded-md text-lg hover:opacity-90"
-            >
-              Book Appointment
-            </button>
-          </form>
-        ) : (
-          <div className="p-10 border rounded-xl bg-green-50 text-center shadow-sm">
-            <h2 className="text-2xl font-semibold text-[#317C82]">
-              Appointment Request Submitted!
-            </h2>
-            <p className="text-[#1C5F62] mt-3">
-              Our team will contact you shortly to confirm your appointment.
-            </p>
+            ))}
           </div>
-        )}
-      </section>
+        </section>
+
+        {/* ON DEMAND */}
+        <section className="bg-gray-50 py-16">
+          <div className="max-w-6xl mx-auto px-4">
+            <h2 className="text-2xl font-semibold text-[#317C82] mb-8">
+              On-Demand Services
+            </h2>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              {[
+                "Advanced Nursing",
+                "Physiotherapy at Home",
+                "Doctor Home Visit Coordination",
+                "Lab Tests at Home",
+                "Vaccination at Home",
+                "Eye Testing at Home",
+                "Nutrition Programs",
+                "Teleconsultation"
+              ].map((service) => (
+                <div
+                  key={service}
+                  className="border rounded-xl bg-white p-6 hover:shadow-lg transition"
+                >
+                  <h3 className="text-lg font-semibold text-[#317C82]">
+                    {service}
+                  </h3>
+
+                  <div className="mt-4 text-sm text-gray-500">
+                    Charges vary by service
+                  </div>
+
+                  <button
+                    onClick={requireAuth}
+                    className="mt-6 w-full bg-[#317C82] text-white py-2 rounded-md hover:opacity-90"
+                  >
+                    Book Service
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* SUBSCRIPTION PLANS */}
+        <section className="max-w-6xl mx-auto px-4 py-16">
+          <h2 className="text-2xl font-semibold text-[#317C82] mb-8">
+            Subscription Plans
+          </h2>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                name: "Basic Care Subscription",
+                bestFor: "Independent seniors",
+                price: "Monthly Plan",
+                includes: [
+                  "Daily check-in calls",
+                  "Medication reminders",
+                  "Weekly caregiver visit",
+                  "Emergency escalation"
+                ]
+              },
+              {
+                name: "Companion Care Subscription",
+                bestFor: "Semi-dependent seniors",
+                price: "Quarterly Plan",
+                includes: [
+                  "Caregiver companionship",
+                  "Daily assistance",
+                  "Medication support",
+                  "Family updates"
+                ]
+              },
+              {
+                name: "Comprehensive Elder Care Plan",
+                bestFor: "Fully dependent seniors",
+                price: "Premium Annual Plan",
+                includes: [
+                  "Dedicated care manager",
+                  "Attendant & nursing visits",
+                  "Medical coordination",
+                  "Emergency response"
+                ]
+              }
+            ].map((plan) => (
+              <div
+                key={plan.name}
+                className="border rounded-xl bg-white p-6 hover:shadow-lg transition"
+              >
+                <h3 className="text-lg font-semibold text-[#317C82]">
+                  {plan.name}
+                </h3>
+
+                <p className="mt-2 text-sm text-gray-500">
+                  Best for: {plan.bestFor}
+                </p>
+
+                <ul className="mt-4 space-y-2 text-sm text-gray-600">
+                  {plan.includes.map((i) => (
+                    <li key={i}>• {i}</li>
+                  ))}
+                </ul>
+
+                <div className="mt-4 text-sm font-medium text-gray-700">
+                  {plan.price}
+                </div>
+
+                <button
+                  onClick={requireAuth}
+                  className="mt-6 w-full bg-[#D3A24C] text-white py-2 rounded-md hover:opacity-90"
+                >
+                  Enquire Now
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* EMERGENCY */}
+        <section className="bg-[#317C82] py-16 text-white text-center">
+          <h2 className="text-2xl font-semibold">
+            Emergency Assistance
+          </h2>
+          <p className="mt-3 text-white/90">
+            Immediate coordination for ambulance, hospital admission, and family notification.
+          </p>
+
+          <button
+            onClick={requireAuth}
+            className="mt-6 bg-white text-[#317C82] px-6 py-3 rounded-md font-medium"
+          >
+            Get Help Now
+          </button>
+        </section>
+
+      </main>
 
       <Footer />
+
+      {/* REGISTER REQUIRED POPUP */}
+      {showAuthPopup && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-8 max-w-md w-full text-center">
+            <h3 className="text-xl font-semibold text-[#1C5F62]">
+              Registration Required
+            </h3>
+            <p className="mt-3 text-gray-600">
+              To ensure safe and personalised elderly care, please register before booking.
+            </p>
+
+            <div className="mt-6 flex gap-4 justify-center">
+              <button
+                onClick={() => router.push("/register")}
+                className="px-5 py-2 bg-[#317C82] text-white rounded-md"
+              >
+                Register
+              </button>
+              <button
+                onClick={() => router.push("/login")}
+                className="px-5 py-2 border rounded-md"
+              >
+                Login
+              </button>
+            </div>
+
+            <button
+              onClick={() => setShowAuthPopup(false)}
+              className="mt-4 text-sm text-gray-500 underline"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }
