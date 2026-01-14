@@ -4,6 +4,8 @@ import Footer from "../../components/Footer";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/router";
+import Block from "../../components/Block";
+
 
 export default function ProductsPage() {
   const [showPopup, setShowPopup] = useState(false);
