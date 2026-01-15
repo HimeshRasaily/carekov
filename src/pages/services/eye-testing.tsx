@@ -1,5 +1,4 @@
-import ServiceTemplate from "./_template";
-
+import ServiceTemplate from "../../components/services/ServiceTemplate";
 export default function EyeTesting() {
   return (
     <ServiceTemplate
