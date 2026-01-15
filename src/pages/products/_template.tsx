@@ -4,6 +4,7 @@ import CTA from "../../components/ui/CTA";
 type ProductTemplateProps = {
   title: string;
   description: string;
+  overview?: string;
   features?: string[];
   ctaText?: string;
   onCtaClick?: () => void;
@@ -12,6 +13,7 @@ type ProductTemplateProps = {
 export default function ProductTemplate({
   title,
   description,
+  overview,
   features = [],
   ctaText = "Book Appointment",
   onCtaClick,
@@ -20,6 +22,10 @@ export default function ProductTemplate({
     <main className="py-12">
       <Block title={title}>
         <p className="text-gray-700">{description}</p>
+
+        {overview && (
+          <p className="mt-4 text-gray-700">{overview}</p>
+        )}
 
         {features.length > 0 && (
           <ul className="list-disc pl-6 mt-4 space-y-2 text-gray-700">
