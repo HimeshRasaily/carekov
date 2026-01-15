@@ -1,4 +1,5 @@
-import ProductTemplate from "./_template";
+import ProductTemplate from "../../components/products/ProductTemplate";
+
 
 export default function OxygenConcentrator() {
   return (
