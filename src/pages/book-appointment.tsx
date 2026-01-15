@@ -1,258 +1,240 @@
-"use client";
-
 import Head from "next/head";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 
-export default function ServicesPage() {
-  const [showAuthPopup, setShowAuthPopup] = useState(false);
-  const router = useRouter();
-
-  const requireAuth = () => setShowAuthPopup(true);
-
+export default function BookAppointment() {
   return (
     <>
       <Head>
-        <title>CareKov Services</title>
+        <title>Book Appointment | CareKov</title>
       </Head>
 
       <Header />
 
-      <main className="min-h-screen">
-
-        {/* Hero */}
-        <section className="bg-gray-50 py-20">
-          <div className="max-w-6xl mx-auto px-4 text-center">
-            <h1 className="text-4xl font-bold text-[#1C5F62]">
-              Our Elderly Care Services
+      <main className="min-h-screen bg-white">
+        {/* INTRO / COPY SECTION */}
+        <section className="bg-gradient-to-r from-[#1C5F62] to-[#2E8B8B] py-24 px-4">
+          <div className="max-w-5xl mx-auto text-center">
+            <h1 className="text-4xl font-bold text-white">
+              Book Trusted Elderly Care Services
             </h1>
-            <p className="mt-4 text-gray-600 max-w-2xl mx-auto">
-              Comprehensive elderly care services designed to support seniors
-              with dignity, safety, and compassion.
+
+            <p className="mt-6 text-white/90 text-lg leading-relaxed">
+              At CareKov, we understand that caring for your loved ones requires
+              more than just medical support — it requires trust, empathy, and
+              reliability. Our curated elderly care services are designed to
+              provide comfort, dignity, and professional care right at home.
             </p>
+
+            <p className="mt-4 text-white/90">
+              Choose the service you need and book an appointment in just a few
+              simple steps.
+            </p>
+
+            <div className="mt-8 w-24 h-1 bg-[#E6C87A] mx-auto rounded-full"></div>
           </div>
         </section>
 
-        {/* REGULAR SERVICES */}
-        <section className="max-w-6xl mx-auto px-4 py-16">
-          <h2 className="text-2xl font-semibold text-[#317C82] mb-8">
-            Regular Services
+        {/* SERVICE CARDS SECTION */}
+        <section className="max-w-6xl mx-auto px-4 py-20">
+          <h2 className="text-2xl font-semibold text-[#1C5F62] text-center mb-10">
+            Our Elderly Care Services
           </h2>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
-                name: "Errand Assistance",
-                desc: "Groceries, medicines, bill payments, appointments and product procurement."
+                title: "Elderly Care Assistance",
+                desc: "Daily living support, companionship, and personal care for seniors at home.",
               },
               {
-                name: "Daily Living Assistance",
-                desc: "Bathing, hygiene, mobility, feeding, and toileting support."
+                title: "Nursing Care",
+                desc: "Qualified nurses for post-hospital care, injections, wound dressing, and monitoring.",
               },
               {
-                name: "Nursing & Health Monitoring",
-                desc: "Vitals monitoring, medication support, and basic wound care."
-              }
-            ].map((service) => (
+                title: "Physiotherapy at Home",
+                desc: "Personalized physiotherapy sessions to improve mobility and recovery.",
+              },
+              {
+                title: "Medical Equipment Support",
+                desc: "Access to essential medical equipment such as hospital beds, oxygen concentrators, and more.",
+              },
+              {
+                title: "Eye Testing at Home",
+                desc: "Professional eye testing services delivered at your doorstep.",
+              },
+              {
+                title: "Doctor Teleconsultation",
+                desc: "Consult experienced doctors from the comfort of your home.",
+              },
+            ].map((service, idx) => (
               <div
-                key={service.name}
-                className="border rounded-xl bg-white p-6 hover:shadow-lg transition"
+                key={idx}
+                className="border rounded-xl p-6 bg-white hover:shadow-lg transition"
               >
-                <h3 className="text-lg font-semibold text-[#317C82]">
-                  {service.name}
+                <h3 className="text-lg font-semibold text-[#1C5F62]">
+                  {service.title}
                 </h3>
-                <p className="mt-3 text-gray-600">{service.desc}</p>
-
-                <div className="mt-4 text-sm text-gray-500">
-                  Starting from <strong>₹ — / visit</strong>
-                </div>
-
-                <button
-                  onClick={requireAuth}
-                  className="mt-6 w-full bg-[#317C82] text-white py-2 rounded-md hover:opacity-90"
-                >
-                  Book Service
-                </button>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* ON DEMAND */}
-        <section className="bg-gray-50 py-16">
-          <div className="max-w-6xl mx-auto px-4">
-            <h2 className="text-2xl font-semibold text-[#317C82] mb-8">
-              On-Demand Services
-            </h2>
-
-            <div className="grid md:grid-cols-3 gap-8">
-              {[
-                "Advanced Nursing",
-                "Physiotherapy at Home",
-                "Doctor Home Visit Coordination",
-                "Lab Tests at Home",
-                "Vaccination at Home",
-                "Eye Testing at Home",
-                "Nutrition Programs",
-                "Teleconsultation"
-              ].map((service) => (
-                <div
-                  key={service}
-                  className="border rounded-xl bg-white p-6 hover:shadow-lg transition"
-                >
-                  <h3 className="text-lg font-semibold text-[#317C82]">
-                    {service}
-                  </h3>
-
-                  <div className="mt-4 text-sm text-gray-500">
-                    Charges vary by service
-                  </div>
-
-                  <button
-                    onClick={requireAuth}
-                    className="mt-6 w-full bg-[#317C82] text-white py-2 rounded-md hover:opacity-90"
-                  >
-                    Book Service
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* SUBSCRIPTION PLANS */}
-        <section className="max-w-6xl mx-auto px-4 py-16">
-          <h2 className="text-2xl font-semibold text-[#317C82] mb-8">
-            Subscription Plans
-          </h2>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                name: "Basic Care Subscription",
-                bestFor: "Independent seniors",
-                price: "Monthly Plan",
-                includes: [
-                  "Daily check-in calls",
-                  "Medication reminders",
-                  "Weekly caregiver visit",
-                  "Emergency escalation"
-                ]
-              },
-              {
-                name: "Companion Care Subscription",
-                bestFor: "Semi-dependent seniors",
-                price: "Quarterly Plan",
-                includes: [
-                  "Caregiver companionship",
-                  "Daily assistance",
-                  "Medication support",
-                  "Family updates"
-                ]
-              },
-              {
-                name: "Comprehensive Elder Care Plan",
-                bestFor: "Fully dependent seniors",
-                price: "Premium Annual Plan",
-                includes: [
-                  "Dedicated care manager",
-                  "Attendant & nursing visits",
-                  "Medical coordination",
-                  "Emergency response"
-                ]
-              }
-            ].map((plan) => (
-              <div
-                key={plan.name}
-                className="border rounded-xl bg-white p-6 hover:shadow-lg transition"
-              >
-                <h3 className="text-lg font-semibold text-[#317C82]">
-                  {plan.name}
-                </h3>
-
-                <p className="mt-2 text-sm text-gray-500">
-                  Best for: {plan.bestFor}
+                <p className="mt-2 text-gray-600 text-sm">
+                  {service.desc}
                 </p>
-
-                <ul className="mt-4 space-y-2 text-sm text-gray-600">
-                  {plan.includes.map((i) => (
-                    <li key={i}>• {i}</li>
-                  ))}
-                </ul>
-
-                <div className="mt-4 text-sm font-medium text-gray-700">
-                  {plan.price}
-                </div>
-
-                <button
-                  onClick={requireAuth}
-                  className="mt-6 w-full bg-[#D3A24C] text-white py-2 rounded-md hover:opacity-90"
-                >
-                  Enquire Now
-                </button>
               </div>
             ))}
           </div>
         </section>
 
-        {/* EMERGENCY */}
-        <section className="bg-[#317C82] py-16 text-white text-center">
-          <h2 className="text-2xl font-semibold">
-            Emergency Assistance
-          </h2>
-          <p className="mt-3 text-white/90">
-            Immediate coordination for ambulance, hospital admission, and family notification.
-          </p>
+        {/* BOOKING FORM SECTION */}
+{/* BOOKING FORM SECTION */}
+<section className="bg-[#F3FAFA] py-24 px-4">
+  <div className="max-w-5xl mx-auto">
+    <h2 className="text-2xl font-semibold text-[#1C5F62] text-center mb-10">
+      Appointment Details
+    </h2>
 
-          <button
-            onClick={requireAuth}
-            className="mt-6 bg-white text-[#317C82] px-6 py-3 rounded-md font-medium"
-          >
-            Get Help Now
-          </button>
-        </section>
+    <form className="bg-white rounded-2xl shadow-lg p-8 md:p-12 grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      {/* Name */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Name
+        </label>
+        <input
+          type="text"
+          className="mt-1 w-full border rounded-md px-4 py-2"
+          placeholder="Enter your name"
+        />
+      </div>
+
+      {/* Mobile / Email */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Mobile / Email
+        </label>
+        <input
+          type="text"
+          className="mt-1 w-full border rounded-md px-4 py-2"
+          placeholder="Enter mobile number or email"
+        />
+      </div>
+
+      {/* Client Name */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Client Name
+        </label>
+        <input
+          type="text"
+          className="mt-1 w-full border rounded-md px-4 py-2"
+          placeholder="Name of person receiving care"
+        />
+      </div>
+
+      {/* Client Mobile / Email */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Client Mobile / Email
+        </label>
+        <input
+          type="text"
+          className="mt-1 w-full border rounded-md px-4 py-2"
+          placeholder="Client contact details"
+        />
+      </div>
+
+      {/* Select City */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Select City
+        </label>
+        <select className="mt-1 w-full border rounded-md px-4 py-2">
+          <option>Select city</option>
+          <option>Mumbai</option>
+          <option>Pune</option>
+        </select>
+      </div>
+
+      {/* Select Service */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Select Service
+        </label>
+        <select className="mt-1 w-full border rounded-md px-4 py-2">
+          <option>Select service</option>
+          <option>Elderly Care Assistance</option>
+          <option>Nursing Care</option>
+          <option>Physiotherapy</option>
+          <option>Medical Equipment</option>
+          <option>Eye Testing</option>
+          <option>Doctor Consultation</option>
+        </select>
+      </div>
+
+      {/* Preferred Date */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Preferred Appointment Date
+        </label>
+        <input
+          type="date"
+          className="mt-1 w-full border rounded-md px-4 py-2"
+        />
+      </div>
+
+      {/* Time Slot */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Preferred Time Slot
+        </label>
+        <select className="mt-1 w-full border rounded-md px-4 py-2">
+          <option>Select time slot</option>
+          <option>9:00 AM – 10:00 AM (1 hr)</option>
+          <option>10:00 AM – 11:00 AM (1 hr)</option>
+          <option>11:00 AM – 1:00 PM (2 hrs)</option>
+          <option>2:00 PM – 4:00 PM (2 hrs)</option>
+          <option>4:00 PM – 5:00 PM (1 hr)</option>
+        </select>
+      </div>
+
+      {/* Client Address */}
+      <div className="md:col-span-2">
+        <label className="block text-sm font-medium text-gray-700">
+          Client Address
+        </label>
+        <textarea
+          rows={3}
+          className="mt-1 w-full border rounded-md px-4 py-2"
+          placeholder="Full address where service is required"
+        ></textarea>
+      </div>
+
+      {/* Remarks */}
+      <div className="md:col-span-2">
+        <label className="block text-sm font-medium text-gray-700">
+          Remarks
+        </label>
+        <textarea
+          rows={3}
+          className="mt-1 w-full border rounded-md px-4 py-2"
+          placeholder="Any special instructions or notes"
+        ></textarea>
+      </div>
+
+      {/* Submit */}
+      <div className="md:col-span-2 text-center pt-6">
+        <button
+          type="submit"
+          className="bg-[#1C5F62] text-white px-12 py-3 rounded-md hover:bg-[#174e50] transition"
+        >
+          Submit Appointment Request
+        </button>
+      </div>
+    </form>
+  </div>
+</section>
 
       </main>
 
       <Footer />
-
-      {/* REGISTER REQUIRED POPUP */}
-      {showAuthPopup && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-8 max-w-md w-full text-center">
-            <h3 className="text-xl font-semibold text-[#1C5F62]">
-              Registration Required
-            </h3>
-            <p className="mt-3 text-gray-600">
-              To ensure safe and personalised elderly care, please register before booking.
-            </p>
-
-            <div className="mt-6 flex gap-4 justify-center">
-              <button
-                onClick={() => router.push("/register")}
-                className="px-5 py-2 bg-[#317C82] text-white rounded-md"
-              >
-                Register
-              </button>
-              <button
-                onClick={() => router.push("/login")}
-                className="px-5 py-2 border rounded-md"
-              >
-                Login
-              </button>
-            </div>
-
-            <button
-              onClick={() => setShowAuthPopup(false)}
-              className="mt-4 text-sm text-gray-500 underline"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
     </>
   );
 }

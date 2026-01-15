@@ -3,6 +3,12 @@ import "../styles/globals.css";
 import type { AppProps } from "next/app";
 import { useEffect, useRef, useState } from "react";
 
+// ✅ ADD THIS IMPORT (relative path, no @ alias)
+import * as GlobalComponents from "../components/global";
+
+// ✅ REGISTER GLOBAL COMPONENTS ONCE
+Object.assign(globalThis, GlobalComponents);
+
 /**
  * Improved loader:
  * - Shows immediately without entrance animation (prevents 'pop').
@@ -11,24 +17,20 @@ import { useEffect, useRef, useState } from "react";
  */
 
 export default function MyApp({ Component, pageProps }: AppProps) {
-  // overlayVisible keeps the overlay mounted; isHiding toggles the fade animation
   const [overlayVisible, setOverlayVisible] = useState<boolean>(true);
   const [isHiding, setIsHiding] = useState<boolean>(false);
   const hideTimer = useRef<number | null>(null);
   const removeTimer = useRef<number | null>(null);
 
   useEffect(() => {
-    // Always show loader for 4 seconds
     hideTimer.current = window.setTimeout(() => {
-      // start hide animation
       setIsHiding(true);
 
-      // after fade duration (1200ms), unmount the overlay
       removeTimer.current = window.setTimeout(() => {
         setOverlayVisible(false);
         setIsHiding(false);
         removeTimer.current = null;
-      }, 1200); // matches fade out duration
+      }, 1200);
       hideTimer.current = null;
     }, 4000);
 
@@ -46,11 +48,9 @@ export default function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <>
-      {/* Overlay is mounted while overlayVisible is true */}
       {overlayVisible && (
         <div
           aria-hidden={!overlayVisible}
-          // NOTE: no transition on mount; transitions only when isHiding === true
           className={`fixed inset-0 z-[9999] flex items-center justify-center bg-white ${
             isHiding
               ? "opacity-0 translate-y-8 pointer-events-none transition-all duration-[1200ms] ease-[cubic-bezier(0.25,0.1,0.25,1)]"
@@ -58,15 +58,13 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           }`}
         >
           <div className="flex flex-col items-center gap-8">
-            {/* -- STATIC LOGO: no transform/scale/shadow to avoid pop effect -- */}
             <img
               src="/images/carekov-logo.png"
               alt="CareKov"
-              className="w-72 h-auto" /* larger per your previous request */
+              className="w-72 h-auto"
               style={{ imageRendering: "auto" }}
             />
 
-            {/* Loading bar (animation only) */}
             <div className="w-[60vw] max-w-md h-3 rounded-full bg-slate-100 overflow-hidden shadow-inner">
               <div
                 className="h-full rounded-full"
@@ -92,7 +90,6 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         </div>
       )}
 
-      {/* Main app content (disable pointer events while overlay mounted to prevent clicks) */}
       <div className={`${overlayVisible ? "pointer-events-none" : ""}`}>
         <Component {...pageProps} />
       </div>
