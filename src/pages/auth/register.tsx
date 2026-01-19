@@ -19,25 +19,53 @@ export default function RegisterPage() {
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleRegister = async () => {
-    if (!firstName || !lastName || !email || !password) {
-      alert("Please fill all required fields.");
-      return;
-    }
+ const handleRegister = async () => {
+  if (!firstName || !lastName || !email || !password) {
+    alert("Please fill all required fields.");
+    return;
+  }
 
-    if (!acceptedTerms) {
-      alert("Please accept Terms & Conditions and Privacy Policy.");
-      return;
-    }
+  if (!acceptedTerms) {
+    alert("Please accept Terms & Conditions and Privacy Policy.");
+    return;
+  }
 
-    try {
-      setLoading(true);
+  setLoading(true);
 
-      const cred = await createUserWithEmailAndPassword(
-        auth,
+  try {
+    // 1️⃣ Create auth account
+    const cred = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+
+    // 2️⃣ Send verification email (non-blocking)
+    sendEmailVerification(cred.user).catch(() => {});
+
+    // 3️⃣ Firestore write (DO NOT await)
+    setDoc(
+      doc(db, "clients", cred.user.uid),
+      {
+        uid: cred.user.uid,
+        firstName,
+        lastName,
         email,
-        password
-      );
+        role: "client",
+        isProfileComplete: false,
+        createdAt: serverTimestamp(),
+      },
+      { merge: true }
+    ).catch(() => {});
+
+    // 4️⃣ Redirect immediately
+    window.location.href = "/";
+  } catch (err: any) {
+    alert(err.message || "Registration failed.");
+    setLoading(false);
+  }
+};
+
 
       // Send verification email
      sendEmailVerification(cred.user).catch(console.error);
