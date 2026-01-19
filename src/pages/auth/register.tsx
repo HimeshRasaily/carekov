@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import {
   createUserWithEmailAndPassword,
-  sendEmailVerification,
+ 
 } from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "../../lib/firebase/firebase";
@@ -21,85 +21,46 @@ export default function RegisterPage() {
 
 const handleRegister = async () => {
   if (!firstName || !lastName || !email || !password) {
-    alert("Please fill all required fields.");
+    alert("Please fill all required fields");
     return;
   }
 
   if (!acceptedTerms) {
-    alert("Please accept Terms & Conditions and Privacy Policy.");
+    alert("Please accept Terms & Conditions and Privacy Policy");
     return;
   }
 
   setLoading(true);
 
   try {
-    // 1️⃣ Create user
-    const userCredential = await createUserWithEmailAndPassword(
+    // Create user
+    const result = await createUserWithEmailAndPassword(
       auth,
       email,
       password
     );
 
-    const user = userCredential.user;
+    const user = result.user;
 
-    // 2️⃣ Send verification email (non-blocking)
-    sendEmailVerification(user).catch(() => {});
+    // Firestore client document
+    await setDoc(doc(db, "clients", user.uid), {
+      uid: user.uid,
+      firstName,
+      lastName,
+      email,
+      role: "client",
+      profileComplete: false,
+      createdAt: serverTimestamp(),
+    });
 
-    // 3️⃣ Create Firestore client document (non-blocking)
-    setDoc(
-      doc(db, "clients", user.uid),
-      {
-        uid: user.uid,
-        firstName,
-        lastName,
-        email,
-        role: "client",
-        isProfileComplete: false,
-        createdAt: serverTimestamp(),
-      },
-      { merge: true }
-    ).catch(() => {});
-
-    // 4️⃣ Redirect immediately (NO WAIT)
+    // Redirect immediately
     window.location.href = "/";
-  } catch (error: any) {
-    alert(error.message || "Registration failed.");
+  } catch (err: any) {
+    alert(err.message || "Registration failed");
     setLoading(false);
   }
 };
 
-
-
-      // Send verification email
-     sendEmailVerification(cred.user).catch(console.error);
-
-
-      // Create client document
-      await setDoc(
-        doc(db, "clients", cred.user.uid),
-        {
-          uid: cred.user.uid,
-          firstName,
-          lastName,
-          email,
-          role: "client",
-          isProfileComplete: false,
-          termsAccepted: true,
-          termsAcceptedAt: serverTimestamp(),
-          createdAt: serverTimestamp(),
-        },
-        { merge: true }
-      );
-
-      alert("Account created! Please verify your email.");
-      window.location.href = "/";
-
-    } catch (err: any) {
-      alert(err.message || "Registration failed.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div style={container}>
