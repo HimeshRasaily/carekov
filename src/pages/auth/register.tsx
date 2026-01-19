@@ -1,8 +1,7 @@
-import { useState } from "react";
-import {
-  createUserWithEmailAndPassword,
-} from "firebase/auth";
+import { useState, useEffect } from "react";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "../../lib/firebase/firebase";
 import Link from "next/link";
 
@@ -13,6 +12,16 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // 🔒 HARD BLOCK: logged-in users cannot stay on register page
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        window.location.replace("/");
+      }
+    });
+    return () => unsub();
+  }, []);
 
   const handleRegister = async () => {
     if (!firstName || !lastName || !email || !password) {
@@ -48,8 +57,8 @@ export default function RegisterPage() {
         createdAt: serverTimestamp(),
       });
 
-      // 3️⃣ HARD redirect (auth-safe)
-      window.location.replace("https://carekov.com/");
+      // 3️⃣ Redirect (homepage will wait for auth hydration)
+      window.location.replace("/");
     } catch (err: any) {
       console.error(err);
       alert(err.message || "Registration failed");
