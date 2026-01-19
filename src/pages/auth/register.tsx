@@ -1,68 +1,26 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/router";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+} from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "../../lib/firebase/firebase";
-import { sendEmailOtp, verifyEmailLink } from "../../lib/firebase/auth";
 import Link from "next/link";
 
 export default function RegisterPage() {
   const router = useRouter();
 
-  // 🔐 Auth state
-  const [verified, setVerified] = useState(false);
-  const [emailInput, setEmailInput] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
-  const [sending, setSending] = useState(false);
-
-  // 🧾 Stage 1 registration state
+  // Form state
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
-  const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  // 🔐 Verify email magic link
-  useEffect(() => {
-    const run = async () => {
-      const ok = await verifyEmailLink();
-      if (ok) setVerified(true);
-    };
-    run();
-  }, []);
-
-  // 🔐 Block logged-in users
-  useEffect(() => {
-    if (auth.currentUser) setVerified(true);
-  }, []);
-
-  // Prefill email if available
-  useEffect(() => {
-    if (auth.currentUser?.email) {
-      setEmail(auth.currentUser.email);
-    }
-  }, []);
-
-  // 📤 Send email OTP (magic link)
-  const sendOtp = async () => {
-    if (!emailInput) {
-      alert("Please enter a valid email address.");
-      return;
-    }
-
-    try {
-      setSending(true);
-      await sendEmailOtp(emailInput);
-      setOtpSent(true);
-    } catch (err: any) {
-      alert(err.message || "Failed to send verification email.");
-    } finally {
-      setSending(false);
-    }
-  };
-
-  // ✅ Stage 1 submit
-  const handleStage1Submit = async () => {
-    if (!firstName || !lastName || !email) {
+  const handleRegister = async () => {
+    if (!firstName || !lastName || !email || !password) {
       alert("Please fill all required fields.");
       return;
     }
@@ -72,16 +30,23 @@ export default function RegisterPage() {
       return;
     }
 
-    const user = auth.currentUser;
-    if (!user) return;
-
     try {
-      setSaving(true);
+      setLoading(true);
 
+      const cred = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      // Send verification email
+      await sendEmailVerification(cred.user);
+
+      // Create client document
       await setDoc(
-        doc(db, "clients", user.uid),
+        doc(db, "clients", cred.user.uid),
         {
-          uid: user.uid,
+          uid: cred.user.uid,
           firstName,
           lastName,
           email,
@@ -94,52 +59,18 @@ export default function RegisterPage() {
         { merge: true }
       );
 
+      alert("Account created! Please verify your email.");
       router.push("/");
-    } catch (err) {
-      console.error("Stage 1 registration failed", err);
-      alert("Something went wrong. Please try again.");
+    } catch (err: any) {
+      alert(err.message || "Registration failed.");
     } finally {
-      setSaving(false);
+      setLoading(false);
     }
   };
 
-  // 🔐 EMAIL OTP SCREEN
-  if (!verified) {
-    return (
-      <div style={container}>
-        <div style={{ marginBottom: 20, fontSize: 14, color: "#666" }}>
-          <strong>Step 1:</strong> Verify Email → Step 2: Registration → Step 3: Profile
-        </div>
-
-        <h2>Verify your email</h2>
-        <p style={{ color: "#555", marginBottom: 16 }}>
-          We’ll send you a secure sign-in link. No SMS required.
-        </p>
-
-        <input
-          placeholder="Email address"
-          value={emailInput}
-          onChange={(e) => setEmailInput(e.target.value)}
-          style={input}
-        />
-
-        <button onClick={sendOtp} disabled={sending} style={button}>
-          {sending ? "Sending link..." : "Send verification link"}
-        </button>
-
-        {otpSent && (
-          <p style={{ marginTop: 12, color: "#0f766e" }}>
-            Check your email and click the verification link.
-          </p>
-        )}
-      </div>
-    );
-  }
-
-  // 🧾 STAGE 1 REGISTRATION
   return (
     <div style={container}>
-      <h2>Tell us a bit about you</h2>
+      <h2>Create your CareKov account</h2>
       <p style={{ color: "#555", marginBottom: 24 }}>
         This will only take a moment. You can complete your profile later.
       </p>
@@ -160,8 +91,17 @@ export default function RegisterPage() {
 
       <input
         placeholder="Email"
+        type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
+        style={input}
+      />
+
+      <input
+        placeholder="Password"
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
         style={input}
       />
 
@@ -183,8 +123,8 @@ export default function RegisterPage() {
         </span>
       </label>
 
-      <button onClick={handleStage1Submit} disabled={saving} style={button}>
-        {saving ? "Saving..." : "Continue"}
+      <button onClick={handleRegister} disabled={loading} style={button}>
+        {loading ? "Creating account..." : "Create Account"}
       </button>
     </div>
   );
