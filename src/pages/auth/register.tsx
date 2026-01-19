@@ -49,7 +49,7 @@ export default function RegisterPage() {
       });
 
       // 3️⃣ HARD redirect (auth-safe)
-      window.location.replace("/");
+      window.location.replace("https://carekov.com/");
     } catch (err: any) {
       console.error(err);
       alert(err.message || "Registration failed");
