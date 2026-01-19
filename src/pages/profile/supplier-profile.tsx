@@ -460,7 +460,7 @@ const btn = {
   fontWeight: 700,
 };
 
-const banner = {
+const banner: React.CSSProperties = {
   background: "#FFF7E6",
   border: "1px solid #FFD591",
   padding: "16px",
