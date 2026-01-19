@@ -5,7 +5,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../../lib/firebase/firebase";
 import AuthLayout from "../../components/auth/AuthLayout";
 
-export default function ProviderLogin() {
+export default function SupplierLogin() {
   const router = useRouter();
 
   const [email, setEmail] = useState("");
@@ -31,13 +31,13 @@ export default function ProviderLogin() {
         password
       );
 
-      // 🔒 Ensure this user is a SERVICE PROVIDER
-      const ref = doc(db, "providers", cred.user.uid);
+      // 🔒 Role verification: must exist in suppliers collection
+      const ref = doc(db, "suppliers", cred.user.uid);
       const snap = await getDoc(ref);
 
       if (!snap.exists()) {
         await auth.signOut();
-        setError("This account is not registered as a Service Provider");
+        setError("This account is not registered as a Supplier");
         return;
       }
 
@@ -52,8 +52,8 @@ export default function ProviderLogin() {
 
   return (
     <AuthLayout
-      title="Login as Service Provider"
-      subtitle="Access your CareKov provider account"
+      title="Login as Supplier"
+      subtitle="Access your CareKov supplier account"
     >
       <form onSubmit={handleLogin}>
         <input

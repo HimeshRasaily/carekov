@@ -1,50 +1,50 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "../../lib/firebase/firebase";
 import AuthLayout from "../../components/auth/AuthLayout";
 
-export default function ProviderLogin() {
+export default function RegisterProvider() {
   const router = useRouter();
 
+  const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    if (!email || !password) {
-      setError("Email and password are required");
+    if (!firstName || !email || !password) {
+      setError("All fields are required");
       return;
     }
 
     try {
       setLoading(true);
 
-      const cred = await signInWithEmailAndPassword(
+      const cred = await createUserWithEmailAndPassword(
         auth,
         email,
         password
       );
 
-      // 🔒 Ensure this user is a SERVICE PROVIDER
-      const ref = doc(db, "providers", cred.user.uid);
-      const snap = await getDoc(ref);
-
-      if (!snap.exists()) {
-        await auth.signOut();
-        setError("This account is not registered as a Service Provider");
-        return;
-      }
+      await setDoc(doc(db, "providers", cred.user.uid), {
+        uid: cred.user.uid,
+        role: "provider",
+        firstName,
+        email,
+        createdAt: serverTimestamp(),
+        profileStatus: "incomplete",
+      });
 
       router.replace("/");
     } catch (err: any) {
       console.error(err);
-      setError(err.message || "Failed to login");
+      setError(err.message || "Failed to register");
     } finally {
       setLoading(false);
     }
@@ -52,10 +52,17 @@ export default function ProviderLogin() {
 
   return (
     <AuthLayout
-      title="Login as Service Provider"
-      subtitle="Access your CareKov provider account"
+      title="Register as Service Provider"
+      subtitle="Create your account to start offering services on CareKov"
     >
-      <form onSubmit={handleLogin}>
+      <form onSubmit={handleRegister}>
+        <input
+          placeholder="First Name"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+          style={input}
+        />
+
         <input
           type="email"
           placeholder="Email Address"
@@ -75,7 +82,7 @@ export default function ProviderLogin() {
         {error && <p style={{ color: "red", marginTop: 10 }}>{error}</p>}
 
         <button disabled={loading} style={button}>
-          {loading ? "Logging in..." : "Login"}
+          {loading ? "Creating account..." : "Register"}
         </button>
       </form>
     </AuthLayout>
@@ -97,7 +104,7 @@ const button: React.CSSProperties = {
   width: "100%",
   padding: "14px",
   borderRadius: 10,
-  background: "#D3A24C",
+  background: "#317C82",
   color: "#fff",
   border: "none",
   fontWeight: 600,

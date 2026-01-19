@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
-import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "../../lib/firebase/firebase";
 import Link from "next/link";
+import AuthLayout from "../../components/auth/AuthLayout";
 
 export default function RegisterPage() {
   const [firstName, setFirstName] = useState("");
@@ -37,7 +37,6 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      // 1️⃣ Create Auth user
       const result = await createUserWithEmailAndPassword(
         auth,
         email,
@@ -46,18 +45,16 @@ export default function RegisterPage() {
 
       const user = result.user;
 
-      // 2️⃣ Create Firestore client document
       await setDoc(doc(db, "clients", user.uid), {
         uid: user.uid,
         firstName,
         lastName,
         email,
         role: "client",
-        profileComplete: false,
+        profileStatus: "incomplete",
         createdAt: serverTimestamp(),
       });
 
-      // 3️⃣ Redirect (homepage will wait for auth hydration)
       window.location.replace("/");
     } catch (err: any) {
       console.error(err);
@@ -67,12 +64,10 @@ export default function RegisterPage() {
   };
 
   return (
-    <div style={container}>
-      <h2>Create your CareKov account</h2>
-      <p style={{ color: "#555", marginBottom: 24 }}>
-        This will only take a moment. You can complete your profile later.
-      </p>
-
+    <AuthLayout
+      title="Create your CareKov account"
+      subtitle="This will only take a moment. You can complete your profile later."
+    >
       <input
         placeholder="First name"
         value={firstName}
@@ -124,18 +119,11 @@ export default function RegisterPage() {
       <button onClick={handleRegister} disabled={loading} style={button}>
         {loading ? "Creating account..." : "Create Account"}
       </button>
-    </div>
+    </AuthLayout>
   );
 }
 
 /* ---------- styles ---------- */
-
-const container: React.CSSProperties = {
-  maxWidth: 420,
-  margin: "40px auto",
-  padding: 20,
-  fontFamily: "system-ui, sans-serif",
-};
 
 const input: React.CSSProperties = {
   width: "100%",

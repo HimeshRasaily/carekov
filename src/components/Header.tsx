@@ -11,36 +11,54 @@ export default function Header() {
 
   const [user, setUser] = useState<User | null>(null);
   const [firstName, setFirstName] = useState<string | null>(null);
+  const [role, setRole] = useState<"client" | "provider" | "supplier" | null>(null);
 
   const [openMobile, setOpenMobile] = useState(false);
   const [openProfile, setOpenProfile] = useState(false);
   const [openRegister, setOpenRegister] = useState(false);
+  const [openLogin, setOpenLogin] = useState(false);
   const [openMore, setOpenMore] = useState(false);
 
-  // 🔐 AUTH + CLIENT PROFILE NAME (PRODUCTION SAFE)
+  // 🔐 AUTH + ROLE DETECTION (SAFE, SEQUENTIAL)
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u);
       setOpenProfile(false);
       setOpenRegister(false);
+      setOpenLogin(false);
 
       if (!u) {
         setFirstName(null);
+        setRole(null);
         return;
       }
 
       try {
-        const ref = doc(db, "clients", u.uid);
-        const snap = await getDoc(ref);
-
-        if (snap.exists()) {
-          setFirstName(snap.data().firstName || null);
-        } else {
-          setFirstName(null);
+        const clientSnap = await getDoc(doc(db, "clients", u.uid));
+        if (clientSnap.exists()) {
+          setFirstName(clientSnap.data().firstName || null);
+          setRole("client");
+          return;
         }
+
+        const providerSnap = await getDoc(doc(db, "providers", u.uid));
+        if (providerSnap.exists()) {
+          setFirstName(providerSnap.data().firstName || null);
+          setRole("provider");
+          return;
+        }
+
+        const supplierSnap = await getDoc(doc(db, "suppliers", u.uid));
+        if (supplierSnap.exists()) {
+          setFirstName(supplierSnap.data().firstName || null);
+          setRole("supplier");
+          return;
+        }
+
+        setRole(null);
       } catch (err) {
-        console.error("Failed to load client name", err);
-        setFirstName(null);
+        console.error("Failed to detect user role", err);
+        setRole(null);
       }
     });
 
@@ -60,7 +78,7 @@ export default function Header() {
         <Link href="/" className="flex items-center gap-3">
           <Image
             src="/images/carekov-logo.png"
-            alt="Carekov"
+            alt="CareKov"
             width={150}
             height={48}
             priority
@@ -79,8 +97,9 @@ export default function Header() {
           <div className="relative">
             <button
               onClick={() => {
-                setOpenMore((s) => !s);
+                setOpenMore(!openMore);
                 setOpenRegister(false);
+                setOpenLogin(false);
                 setOpenProfile(false);
               }}
               style={{ color: primary }}
@@ -99,15 +118,16 @@ export default function Header() {
             )}
           </div>
 
-          {/* AUTH AWARE */}
+          {/* AUTH */}
           {!user ? (
             <div className="flex items-center gap-3">
 
+              {/* Register */}
               <div className="relative">
                 <button
                   onClick={() => {
-                    setOpenRegister((s) => !s);
-                    setOpenProfile(false);
+                    setOpenRegister(!openRegister);
+                    setOpenLogin(false);
                     setOpenMore(false);
                   }}
                   className="px-4 py-2 rounded-md text-white"
@@ -117,30 +137,50 @@ export default function Header() {
                 </button>
 
                 {openRegister && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white border rounded-md shadow-md z-20">
+                  <div className="absolute right-0 mt-2 min-w-[220px] bg-white border rounded-md shadow-md z-20">
                     <ul className="p-3 space-y-2 text-sm">
-                      <li><Link href="/auth/register">Register as Client</Link></li>
-                      <li><Link href="/register/provider">Register as Service Provider</Link></li>
+                      <li><Link href="/auth/register">Client</Link></li>
+                      <li><Link href="/auth/register-provider">Service Provider</Link></li>
+                      <li><Link href="/auth/register-supplier">Supplier</Link></li>
                     </ul>
                   </div>
                 )}
               </div>
 
-              <Link
-                href="/login/client"
-                className="px-4 py-2 rounded-md text-white"
-                style={{ backgroundColor: accent }}
-              >
-                Login
-              </Link>
+              {/* Login */}
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    setOpenLogin(!openLogin);
+                    setOpenRegister(false);
+                    setOpenMore(false);
+                  }}
+                  className="px-4 py-2 rounded-md text-white"
+                  style={{ backgroundColor: accent }}
+                >
+                  Login ▾
+                </button>
+
+                {openLogin && (
+                  <div className="absolute right-0 mt-2 min-w-[220px] bg-white border rounded-md shadow-md z-20">
+                    <ul className="p-3 space-y-2 text-sm">
+                      <li><Link href="/login/client">Client</Link></li>
+                      <li><Link href="/login/provider">Service Provider</Link></li>
+                      <li><Link href="/login/supplier">Supplier</Link></li>
+                    </ul>
+                  </div>
+                )}
+              </div>
+
             </div>
           ) : (
-            /* PROFILE */
+            /* LOGGED-IN MENU */
             <div className="relative">
               <button
                 onClick={() => {
-                  setOpenProfile((s) => !s);
+                  setOpenProfile(!openProfile);
                   setOpenRegister(false);
+                  setOpenLogin(false);
                   setOpenMore(false);
                 }}
                 className="px-4 py-2 rounded-md text-white"
@@ -150,10 +190,33 @@ export default function Header() {
               </button>
 
               {openProfile && (
-                <div className="absolute right-0 mt-2 w-56 bg-white border rounded-md shadow-md z-20">
+                <div className="absolute right-0 mt-2 w-60 bg-white border rounded-md shadow-md z-20">
                   <ul className="p-3 space-y-2 text-sm">
-                    <li><Link href="/profile">Profile</Link></li>
-                    <li><Link href="/profile/complete">Complete Profile</Link></li>
+
+                    {role === "provider" && (
+                      <li>
+                        <Link href="/profile/service-provider">
+                          Service Provider Profile
+                        </Link>
+                      </li>
+                    )}
+
+                    {role === "client" && (
+                      <li>
+                        <Link href="/profile/complete">
+                          Client Profile
+                        </Link>
+                      </li>
+                    )}
+
+                    {role === "supplier" && (
+                      <li>
+                        <Link href="/profile/supplier-profile">
+                          Supplier Profile
+                        </Link>
+                      </li>
+                    )}
+
                     <li>
                       <button
                         onClick={handleLogout}
@@ -162,6 +225,7 @@ export default function Header() {
                         Logout
                       </button>
                     </li>
+
                   </ul>
                 </div>
               )}
@@ -172,7 +236,7 @@ export default function Header() {
         {/* Mobile Toggle */}
         <div className="md:hidden">
           <button
-            onClick={() => setOpenMobile((s) => !s)}
+            onClick={() => setOpenMobile(!openMobile)}
             className="p-2 border rounded-md"
           >
             {openMobile ? "✕" : "☰"}
@@ -192,35 +256,20 @@ export default function Header() {
 
             {!user ? (
               <>
-                <details>
-                  <summary className="cursor-pointer">Register</summary>
-                  <div className="pl-4 mt-2 space-y-1">
-                    <Link href="/auth/register" className="block">Register as Client</Link>
-                    <Link href="/register/provider" className="block">Register as Service Provider</Link>
-                  </div>
-                </details>
-
-                <details>
-                  <summary className="cursor-pointer">Login</summary>
-                  <div className="pl-4 mt-2 space-y-1">
-                    <Link href="/login/client" className="block">Login — Client</Link>
-                    <Link href="/login/provider" className="block">Login — Service Provider</Link>
-                  </div>
-                </details>
+                <Link href="/auth/register" className="block">Register</Link>
+                <Link href="/login/client" className="block">Login</Link>
               </>
             ) : (
-              <details>
-                <summary className="cursor-pointer">
-                  Hi, {firstName || "User"}
-                </summary>
-                <div className="pl-4 mt-2 space-y-1">
-                  <Link href="/profile" className="block">Profile</Link>
-                  <Link href="/profile/complete" className="block">Complete Profile</Link>
-                  <button onClick={handleLogout} className="block text-red-600">
-                    Logout
-                  </button>
-                </div>
-              </details>
+              <>
+                {role === "provider" && (
+                  <Link href="/profile/service-provider" className="block">
+                    Service Provider Profile
+                  </Link>
+                )}
+                <button onClick={handleLogout} className="block text-red-600">
+                  Logout
+                </button>
+              </>
             )}
 
             <details>
