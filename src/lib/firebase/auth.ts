@@ -14,13 +14,13 @@ export const isPhoneNumber = (value: string) =>
 export const isEmail = (value: string) =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
-// ---------- phone otp (SAFE) ----------
+// ---------- phone otp (SAFE – kept for later) ----------
 export const setupRecaptcha = () => {
   if (typeof window === "undefined") return;
 
   if (!window.recaptchaVerifier) {
     window.recaptchaVerifier = new RecaptchaVerifier(
-      auth, // 🔥 auth FIRST (important)
+      auth,
       "recaptcha-container",
       {
         size: "invisible",
@@ -40,10 +40,11 @@ export const sendPhoneOtp = async (phone: string) => {
   return await signInWithPhoneNumber(auth, phone, appVerifier);
 };
 
-// ---------- email magic link ----------
+// ---------- email magic link (PRODUCTION FIX) ----------
 export const sendEmailOtp = async (email: string) => {
   const actionCodeSettings = {
-    url: `${window.location.origin}/auth/register`,
+    // 🔒 MUST be exact, approved production URL
+    url: "https://carekov.com/auth/register",
     handleCodeInApp: true,
   };
 
