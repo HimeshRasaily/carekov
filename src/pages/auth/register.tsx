@@ -1,266 +1,191 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { getAuth, ConfirmationResult } from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "../../lib/firebase/firebase";
-import {
-  sendPhoneOtp,
-  sendEmailOtp,
-  isPhoneNumber,
-  isEmail,
-  verifyEmailLink,
-} from "../../lib/firebase/auth";
+import { auth, db } from "../../lib/firebase/firebase";
+import { sendEmailOtp, verifyEmailLink } from "../../lib/firebase/auth";
+import Link from "next/link";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const auth = getAuth();
 
-  // 🔐 OTP & auth state
+  // 🔐 Auth state
   const [verified, setVerified] = useState(false);
-  const [identifier, setIdentifier] = useState("");
-  const [otp, setOtp] = useState("");
+  const [emailInput, setEmailInput] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [sending, setSending] = useState(false);
-  const [confirmationResult, setConfirmationResult] =
-    useState<ConfirmationResult | null>(null);
-  const [resendCooldown, setResendCooldown] = useState(0);
 
-  // 🧾 Registration state
-  const [careFor, setCareFor] = useState<"self" | "parent" | "">("");
-  const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({
-    fullName: "",
-    phone: "",
-    relation: "",
-  });
+  // 🧾 Stage 1 registration state
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [saving, setSaving] = useState(false);
 
-  // 🔐 Handle email magic link
+  // 🔐 Verify email magic link
   useEffect(() => {
     const run = async () => {
-      const emailVerified = await verifyEmailLink();
-      if (emailVerified) setVerified(true);
+      const ok = await verifyEmailLink();
+      if (ok) setVerified(true);
     };
     run();
   }, []);
 
-  // 🔐 Handle existing login
+  // 🔐 Block logged-in users
   useEffect(() => {
     if (auth.currentUser) setVerified(true);
-  }, [auth.currentUser]);
+  }, []);
 
-  // ⏳ OTP resend cooldown
+  // Prefill email if available
   useEffect(() => {
-    if (resendCooldown <= 0) return;
+    if (auth.currentUser?.email) {
+      setEmail(auth.currentUser.email);
+    }
+  }, []);
 
-    const timer = setInterval(() => {
-      setResendCooldown((c) => c - 1);
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [resendCooldown]);
-
-  // 📤 Send OTP
+  // 📤 Send email OTP (magic link)
   const sendOtp = async () => {
-    setSending(true);
+    if (!emailInput) {
+      alert("Please enter a valid email address.");
+      return;
+    }
 
     try {
-      if (isPhoneNumber(identifier)) {
-        const result = await sendPhoneOtp(identifier);
-        setConfirmationResult(result);
-        setOtpSent(true);
-        setResendCooldown(30);
-      } else if (isEmail(identifier)) {
-        await sendEmailOtp(identifier);
-        setOtpSent(true);
-        setResendCooldown(30);
-      } else {
-        alert("Please enter a valid phone number or email");
-      }
+      setSending(true);
+      await sendEmailOtp(emailInput);
+      setOtpSent(true);
     } catch (err: any) {
-      alert(err.message || "Failed to send OTP");
+      alert(err.message || "Failed to send verification email.");
+    } finally {
+      setSending(false);
     }
-
-    setSending(false);
   };
 
-  // 📲 Verify phone OTP
-  const verifyPhoneOtp = async () => {
-    if (!confirmationResult) return;
+  // ✅ Stage 1 submit
+  const handleStage1Submit = async () => {
+    if (!firstName || !lastName || !email) {
+      alert("Please fill all required fields.");
+      return;
+    }
+
+    if (!acceptedTerms) {
+      alert("Please accept Terms & Conditions and Privacy Policy.");
+      return;
+    }
+
+    const user = auth.currentUser;
+    if (!user) return;
 
     try {
-      await confirmationResult.confirm(otp);
-      setVerified(true);
-    } catch {
-      alert("Invalid OTP. Please try again.");
+      setSaving(true);
+
+      await setDoc(
+        doc(db, "clients", user.uid),
+        {
+          uid: user.uid,
+          firstName,
+          lastName,
+          email,
+          role: "client",
+          isProfileComplete: false,
+          termsAccepted: true,
+          termsAcceptedAt: serverTimestamp(),
+          createdAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+
+      router.push("/");
+    } catch (err) {
+      console.error("Stage 1 registration failed", err);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setSaving(false);
     }
   };
 
-  // 📝 Form change
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  // ✅ Save registration
-  const handleSubmit = async () => {
-    if (!auth.currentUser) return;
-
-    setLoading(true);
-
-    await setDoc(doc(db, "clients", auth.currentUser.uid), {
-      uid: auth.currentUser.uid,
-      careFor,
-      profile: {
-        fullName: form.fullName,
-        phone: form.phone,
-        relation: careFor === "parent" ? form.relation : null,
-      },
-      createdAt: serverTimestamp(),
-    });
-
-    router.push("/profile/complete");
-  };
-
-  // 🔐 OTP SCREEN
+  // 🔐 EMAIL OTP SCREEN
   if (!verified) {
     return (
       <div style={container}>
-        {/* STEP INDICATOR */}
         <div style={{ marginBottom: 20, fontSize: 14, color: "#666" }}>
-          <strong>Step 1:</strong> Verify &nbsp;→&nbsp;
-          Step 2: Registration &nbsp;→&nbsp;
-          Step 3: Medical Profile
+          <strong>Step 1:</strong> Verify Email → Step 2: Registration → Step 3: Profile
         </div>
 
-        <h2>Verify Email or Mobile</h2>
+        <h2>Verify your email</h2>
         <p style={{ color: "#555", marginBottom: 16 }}>
-          Enter your phone number or email to receive an OTP
+          We’ll send you a secure sign-in link. No SMS required.
         </p>
 
         <input
-          placeholder="Email or mobile number"
-          value={identifier}
-          onChange={(e) => setIdentifier(e.target.value)}
+          placeholder="Email address"
+          value={emailInput}
+          onChange={(e) => setEmailInput(e.target.value)}
           style={input}
         />
 
         <button onClick={sendOtp} disabled={sending} style={button}>
-          {sending ? "Sending OTP..." : "Send OTP"}
+          {sending ? "Sending link..." : "Send verification link"}
         </button>
 
-        <div id="recaptcha-container"></div>
-
-        {/* PHONE OTP */}
-        {confirmationResult && (
-          <>
-            <input
-              placeholder="Enter OTP"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-              style={input}
-            />
-
-            <button onClick={verifyPhoneOtp} style={button}>
-              Verify OTP
-            </button>
-          </>
-        )}
-
-        {/* EMAIL MESSAGE */}
-        {otpSent && !confirmationResult && (
-          <p style={{ marginTop: 12, color: "#0f766e" }}>
-            A secure sign-in link has been sent to your email.
-          </p>
-        )}
-
-        {/* RESEND OTP */}
         {otpSent && (
-          <button
-            onClick={sendOtp}
-            disabled={resendCooldown > 0}
-            style={{
-              marginTop: 10,
-              background: "transparent",
-              border: "none",
-              color: resendCooldown > 0 ? "#999" : "#0f766e",
-              cursor: resendCooldown > 0 ? "not-allowed" : "pointer",
-              fontWeight: 500,
-            }}
-          >
-            {resendCooldown > 0
-              ? `Resend OTP in ${resendCooldown}s`
-              : "Resend OTP"}
-          </button>
+          <p style={{ marginTop: 12, color: "#0f766e" }}>
+            Check your email and click the verification link.
+          </p>
         )}
       </div>
     );
   }
 
-  // 🧾 REGISTRATION FORM
+  // 🧾 STAGE 1 REGISTRATION
   return (
     <div style={container}>
-      <h2>Care Registration</h2>
+      <h2>Tell us a bit about you</h2>
+      <p style={{ color: "#555", marginBottom: 24 }}>
+        This will only take a moment. You can complete your profile later.
+      </p>
 
-      <div style={card}>
-        <h3>Who will receive the care?</h3>
+      <input
+        placeholder="First name"
+        value={firstName}
+        onChange={(e) => setFirstName(e.target.value)}
+        style={input}
+      />
 
-        <label style={radio}>
-          <input
-            type="radio"
-            checked={careFor === "self"}
-            onChange={() => setCareFor("self")}
-          />
-          I will receive the care
-        </label>
+      <input
+        placeholder="Last name"
+        value={lastName}
+        onChange={(e) => setLastName(e.target.value)}
+        style={input}
+      />
 
-        <label style={radio}>
-          <input
-            type="radio"
-            checked={careFor === "parent"}
-            onChange={() => setCareFor("parent")}
-          />
-          My parent / elderly family member
-        </label>
-      </div>
+      <input
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        style={input}
+      />
 
-      {careFor && (
-        <div style={card}>
-          <h3>Basic Details</h3>
+      <label style={terms}>
+        <input
+          type="checkbox"
+          checked={acceptedTerms}
+          onChange={(e) => setAcceptedTerms(e.target.checked)}
+        />
+        <span>
+          I agree to the{" "}
+          <Link href="/terms-and-conditions" target="_blank">
+            Terms & Conditions
+          </Link>{" "}
+          and{" "}
+          <Link href="/privacy-policy" target="_blank">
+            Privacy Policy
+          </Link>
+        </span>
+      </label>
 
-          <input
-            name="fullName"
-            placeholder={
-              careFor === "self"
-                ? "Your full name"
-                : "Elderly person’s full name"
-            }
-            value={form.fullName}
-            onChange={handleChange}
-            style={input}
-          />
-
-          <input
-            name="phone"
-            placeholder="Contact phone number"
-            value={form.phone}
-            onChange={handleChange}
-            style={input}
-          />
-
-          {careFor === "parent" && (
-            <input
-              name="relation"
-              placeholder="Relation (e.g. Son, Daughter)"
-              value={form.relation}
-              onChange={handleChange}
-              style={input}
-            />
-          )}
-
-          <button onClick={handleSubmit} disabled={loading} style={button}>
-            {loading ? "Saving..." : "Complete Registration"}
-          </button>
-        </div>
-      )}
+      <button onClick={handleStage1Submit} disabled={saving} style={button}>
+        {saving ? "Saving..." : "Continue"}
+      </button>
     </div>
   );
 }
@@ -274,17 +199,9 @@ const container: React.CSSProperties = {
   fontFamily: "system-ui, sans-serif",
 };
 
-const card: React.CSSProperties = {
-  background: "#ffffff",
-  padding: 20,
-  marginTop: 20,
-  borderRadius: 12,
-  boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
-};
-
 const input: React.CSSProperties = {
   width: "100%",
-  padding: "10px 12px",
+  padding: "12px",
   marginTop: 12,
   borderRadius: 8,
   border: "1px solid #ccc",
@@ -295,14 +212,16 @@ const button: React.CSSProperties = {
   width: "100%",
   padding: "12px",
   borderRadius: 8,
-  background: "#0f766e",
+  background: "#317C82",
   color: "#fff",
   border: "none",
   fontWeight: 600,
   cursor: "pointer",
 };
 
-const radio: React.CSSProperties = {
-  display: "block",
-  marginTop: 10,
+const terms: React.CSSProperties = {
+  display: "flex",
+  gap: 8,
+  marginTop: 16,
+  fontSize: 14,
 };
