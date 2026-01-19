@@ -40,7 +40,8 @@ export default function RegisterPage() {
       );
 
       // Send verification email
-      await sendEmailVerification(cred.user);
+     sendEmailVerification(cred.user).catch(console.error);
+
 
       // Create client document
       await setDoc(
@@ -60,7 +61,8 @@ export default function RegisterPage() {
       );
 
       alert("Account created! Please verify your email.");
-      router.push("/");
+      window.location.href = "/";
+
     } catch (err: any) {
       alert(err.message || "Registration failed.");
     } finally {
