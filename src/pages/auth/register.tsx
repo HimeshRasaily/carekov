@@ -1,17 +1,12 @@
 import { useState } from "react";
-import { useRouter } from "next/router";
 import {
   createUserWithEmailAndPassword,
- 
 } from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "../../lib/firebase/firebase";
 import Link from "next/link";
 
 export default function RegisterPage() {
-  const router = useRouter();
-
-  // Form state
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -19,48 +14,48 @@ export default function RegisterPage() {
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [loading, setLoading] = useState(false);
 
-const handleRegister = async () => {
-  if (!firstName || !lastName || !email || !password) {
-    alert("Please fill all required fields");
-    return;
-  }
+  const handleRegister = async () => {
+    if (!firstName || !lastName || !email || !password) {
+      alert("Please fill all required fields");
+      return;
+    }
 
-  if (!acceptedTerms) {
-    alert("Please accept Terms & Conditions and Privacy Policy");
-    return;
-  }
+    if (!acceptedTerms) {
+      alert("Please accept Terms & Conditions and Privacy Policy");
+      return;
+    }
 
-  setLoading(true);
+    setLoading(true);
 
-  try {
-    // Create user
-    const result = await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
+    try {
+      // 1️⃣ Create Auth user
+      const result = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
 
-    const user = result.user;
+      const user = result.user;
 
-    // Firestore client document
-    await setDoc(doc(db, "clients", user.uid), {
-      uid: user.uid,
-      firstName,
-      lastName,
-      email,
-      role: "client",
-      profileComplete: false,
-      createdAt: serverTimestamp(),
-    });
+      // 2️⃣ Create Firestore client document
+      await setDoc(doc(db, "clients", user.uid), {
+        uid: user.uid,
+        firstName,
+        lastName,
+        email,
+        role: "client",
+        profileComplete: false,
+        createdAt: serverTimestamp(),
+      });
 
-    // Redirect immediately
-    window.location.href = "/";
-  } catch (err: any) {
-    alert(err.message || "Registration failed");
-    setLoading(false);
-  }
-};
-
+      // 3️⃣ HARD redirect (auth-safe)
+      window.location.replace("/");
+    } catch (err: any) {
+      console.error(err);
+      alert(err.message || "Registration failed");
+      setLoading(false);
+    }
+  };
 
   return (
     <div style={container}>
