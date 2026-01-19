@@ -2,11 +2,7 @@ import { auth, db } from "../lib/firebase/firebase";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import {
-  onAuthStateChanged,
-  signOut,
-  User,
-} from "firebase/auth";
+import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 
 export default function Header() {
@@ -21,26 +17,29 @@ export default function Header() {
   const [openRegister, setOpenRegister] = useState(false);
   const [openMore, setOpenMore] = useState(false);
 
-  // 🔐 AUTH + CLIENT PROFILE NAME
+  // 🔐 AUTH + CLIENT PROFILE NAME (PRODUCTION SAFE)
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u);
+      setOpenProfile(false);
+      setOpenRegister(false);
 
-      if (u) {
-        try {
-          const ref = doc(db, "clients", u.uid);
-          const snap = await getDoc(ref);
+      if (!u) {
+        setFirstName(null);
+        return;
+      }
 
-          if (snap.exists()) {
-            setFirstName(snap.data().firstName || null);
-          } else {
-            setFirstName(null);
-          }
-        } catch (err) {
-          console.error("Failed to load client name", err);
+      try {
+        const ref = doc(db, "clients", u.uid);
+        const snap = await getDoc(ref);
+
+        if (snap.exists()) {
+          setFirstName(snap.data().firstName || null);
+        } else {
           setFirstName(null);
         }
-      } else {
+      } catch (err) {
+        console.error("Failed to load client name", err);
         setFirstName(null);
       }
     });
@@ -50,7 +49,7 @@ export default function Header() {
 
   const handleLogout = async () => {
     await signOut(auth);
-    window.location.href = "/";
+    window.location.replace("/");
   };
 
   return (
@@ -78,7 +77,14 @@ export default function Header() {
 
           {/* More */}
           <div className="relative">
-            <button onClick={() => setOpenMore(s => !s)} style={{ color: primary }}>
+            <button
+              onClick={() => {
+                setOpenMore((s) => !s);
+                setOpenRegister(false);
+                setOpenProfile(false);
+              }}
+              style={{ color: primary }}
+            >
               More ▾
             </button>
 
@@ -99,7 +105,11 @@ export default function Header() {
 
               <div className="relative">
                 <button
-                  onClick={() => setOpenRegister(s => !s)}
+                  onClick={() => {
+                    setOpenRegister((s) => !s);
+                    setOpenProfile(false);
+                    setOpenMore(false);
+                  }}
                   className="px-4 py-2 rounded-md text-white"
                   style={{ backgroundColor: primary }}
                 >
@@ -128,11 +138,15 @@ export default function Header() {
             /* PROFILE */
             <div className="relative">
               <button
-                onClick={() => setOpenProfile(s => !s)}
+                onClick={() => {
+                  setOpenProfile((s) => !s);
+                  setOpenRegister(false);
+                  setOpenMore(false);
+                }}
                 className="px-4 py-2 rounded-md text-white"
                 style={{ backgroundColor: accent }}
               >
-                Hi, {firstName || "Profile"} ▾
+                Hi, {firstName || "User"} ▾
               </button>
 
               {openProfile && (
@@ -158,7 +172,7 @@ export default function Header() {
         {/* Mobile Toggle */}
         <div className="md:hidden">
           <button
-            onClick={() => setOpenMobile(s => !s)}
+            onClick={() => setOpenMobile((s) => !s)}
             className="p-2 border rounded-md"
           >
             {openMobile ? "✕" : "☰"}
@@ -197,7 +211,7 @@ export default function Header() {
             ) : (
               <details>
                 <summary className="cursor-pointer">
-                  Hi, {firstName || "Profile"}
+                  Hi, {firstName || "User"}
                 </summary>
                 <div className="pl-4 mt-2 space-y-1">
                   <Link href="/profile" className="block">Profile</Link>
