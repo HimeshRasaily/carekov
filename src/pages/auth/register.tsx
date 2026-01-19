@@ -19,7 +19,7 @@ export default function RegisterPage() {
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [loading, setLoading] = useState(false);
 
- const handleRegister = async () => {
+const handleRegister = async () => {
   if (!firstName || !lastName || !email || !password) {
     alert("Please fill all required fields.");
     return;
@@ -33,21 +33,23 @@ export default function RegisterPage() {
   setLoading(true);
 
   try {
-    // 1️⃣ Create auth account
-    const cred = await createUserWithEmailAndPassword(
+    // 1️⃣ Create user
+    const userCredential = await createUserWithEmailAndPassword(
       auth,
       email,
       password
     );
 
-    // 2️⃣ Send verification email (non-blocking)
-    sendEmailVerification(cred.user).catch(() => {});
+    const user = userCredential.user;
 
-    // 3️⃣ Firestore write (DO NOT await)
+    // 2️⃣ Send verification email (non-blocking)
+    sendEmailVerification(user).catch(() => {});
+
+    // 3️⃣ Create Firestore client document (non-blocking)
     setDoc(
-      doc(db, "clients", cred.user.uid),
+      doc(db, "clients", user.uid),
       {
-        uid: cred.user.uid,
+        uid: user.uid,
         firstName,
         lastName,
         email,
@@ -58,13 +60,14 @@ export default function RegisterPage() {
       { merge: true }
     ).catch(() => {});
 
-    // 4️⃣ Redirect immediately
+    // 4️⃣ Redirect immediately (NO WAIT)
     window.location.href = "/";
-  } catch (err: any) {
-    alert(err.message || "Registration failed.");
+  } catch (error: any) {
+    alert(error.message || "Registration failed.");
     setLoading(false);
   }
 };
+
 
 
       // Send verification email
